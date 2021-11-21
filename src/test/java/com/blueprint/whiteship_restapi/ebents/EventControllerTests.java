@@ -1,6 +1,7 @@
 package com.blueprint.whiteship_restapi.ebents;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -37,6 +38,7 @@ public class EventControllerTests {
     @Test
     void createEvent() throws Exception {
         Event event = Event.builder()
+                .id(100)
                 .name("Spring")
                 .description("REST API Development whth spring")
                 .beginEnrollmentDateTime(LocalDateTime.of(2018, 11, 21, 13, 15))
@@ -47,8 +49,16 @@ public class EventControllerTests {
                 .maxPrice(200)
                 .limitOfEnrollment(100)
                 .location("강남역 1번 출구")
+                .free(true) //이런 값들은 계산해서 들어오는 값들 입력되는 값이 들어오면 안된다.
+                .offline(false)
                 .build();
-        event.setId(10);
+        /**
+         * 아래 목킹한 save(event) event 오브젝트가 서로 다르다.! 그래서 null 포인트가 떨어진다. !
+         * controller에서 저장한 객체는 메서드 안에서 새로생성한 객체이기 때문에 테스트 코드에 작성한
+         * 객체와 같지 않다. ?
+         * 그래서 목킹한게 적용이 되지 않아서 목 객체가 리턴한 Null이 리턴이 됐고 그래서 널포인트익셉션이 발생했다.
+         * 목킹했을 때 파라메터에 event오브젝트가 있어야 이벤트의 event 오브젝트를 리턴하는데 이 경우가 아니다. !
+         * */
         Mockito.when(eventRepository.save(event)).thenReturn(event);
 
         mockMvc.perform(post("/api/events/")
@@ -67,6 +77,8 @@ public class EventControllerTests {
  */
                 .andExpect(header().exists(HttpHeaders.LOCATION))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
+                .andExpect(jsonPath("id").value(Matchers.not(100)))
+                .andExpect(jsonPath("free").value(Matchers.not(true)))
         ;
     }
 
