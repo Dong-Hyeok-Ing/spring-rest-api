@@ -4,26 +4,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.time.LocalDateTime;
 
-
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.head;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest
+@SpringBootTest
+@AutoConfigureMockMvc
 public class EventControllerTests {
 
     @Autowired
@@ -31,9 +28,6 @@ public class EventControllerTests {
 
     @Autowired
     ObjectMapper objectMapper;
-
-    @MockBean
-    EventRepository eventRepository;
 
     @Test
     void createEvent() throws Exception {
@@ -58,8 +52,8 @@ public class EventControllerTests {
          * 객체와 같지 않다. ?
          * 그래서 목킹한게 적용이 되지 않아서 목 객체가 리턴한 Null이 리턴이 됐고 그래서 널포인트익셉션이 발생했다.
          * 목킹했을 때 파라메터에 event오브젝트가 있어야 이벤트의 event 오브젝트를 리턴하는데 이 경우가 아니다. !
+         * 목킹을 안한다. !
          * */
-        Mockito.when(eventRepository.save(event)).thenReturn(event);
 
         mockMvc.perform(post("/api/events/")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -68,6 +62,11 @@ public class EventControllerTests {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").exists())
+                .andExpect(header().exists(HttpHeaders.LOCATION))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
+                .andExpect(jsonPath("id").value(Matchers.not(100)))
+                .andExpect(jsonPath("free").value(Matchers.not(true)))
+        ;
 //                .andExpect(header().exists("Location")) 주석처리 된 것을 아래 처럼 타입 세이프 하게
 //                .andExpect(header().string("Content-Type","application/hal+json" ))
 /**
@@ -75,11 +74,6 @@ public class EventControllerTests {
  *  그냥 HttpHeaders 제공하는 컨텐츠 타입이 잘 못 됐을 때 컴파일 시점에서 미리 알수 있기 때문에 안정성을 확보했다고
  *  보는 것을 타입 세이프 하다라고 하는 것인가.. ?
  */
-                .andExpect(header().exists(HttpHeaders.LOCATION))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_VALUE))
-                .andExpect(jsonPath("id").value(Matchers.not(100)))
-                .andExpect(jsonPath("free").value(Matchers.not(true)))
-        ;
     }
 
 }
