@@ -2,6 +2,7 @@ package com.blueprint.whiteship_restapi.ebents;
 
 import lombok.*;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Builder
@@ -10,9 +11,11 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @EqualsAndHashCode(of = "id")
+@Entity
 //@Data Entity에다가는 데이터 에노테이션을 만들지 않는다. !  "상호참조가 일어난다." 스텍오버 플로어가 발생할 수 있다.
 public class Event {
 
+    @Id @GeneratedValue
     private Integer id;
     private String name;
     private String description;
@@ -26,5 +29,7 @@ public class Event {
     private int limitOfEnrollment;
     private boolean offline;
     private boolean free;
+
+    @Enumerated(EnumType.STRING)
     private EventStatus eventStatus;
 }
