@@ -2,6 +2,7 @@ package com.blueprint.whiteship_restapi.ebents;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,9 @@ public class EventControllerTests {
     ObjectMapper objectMapper;
 
     @Test
+    @DisplayName("정상적으로 이벤트를 생성하는 테스트")
     void createEvent() throws Exception {
-        Event event = Event.builder()
+        EventDto event = EventDto.builder()
                 .name("Spring")
                 .description("REST API Development whth spring")
                 .beginEnrollmentDateTime(LocalDateTime.of(2018, 11, 21, 13, 15))
@@ -74,6 +76,7 @@ public class EventControllerTests {
     }
 
     @Test
+    @DisplayName("입력 받을 수 없는 값을 사용한 경우 에러 발생하는 테스트")
     void createEvent_Bad_req() throws Exception {
         Event event = Event.builder()
                 .id(100)
@@ -105,8 +108,40 @@ public class EventControllerTests {
                         .accept(MediaTypes.HAL_JSON)
                         .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
-        ;
+                .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @DisplayName("입력 값이 비어있는 경우 발생하는 에러 테스트")
+    void createEvent_Bad_req_Empty_Input() throws Exception {
+        EventDto eventDto = EventDto.builder().build();
+
+        this.mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(eventDto))
+        );
+    }
+
+
+    @Test
+    @DisplayName("입력 값이 잘 못된 경우 발생하는 테스트")
+    void createEvent_Bad_req_Enpty_Input() throws Exception {
+        EventDto eventDto = EventDto.builder()
+                .name("Spring")
+                .description("REST API Development whth spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2018, 11, 21, 13, 15))
+                .closeEnrollmentDateTime(LocalDateTime.of(2018, 11, 22, 13, 15))
+                .beginEventDateTime(LocalDateTime.of(2018, 11, 30, 13, 15))
+                .endEventDateTime(LocalDateTime.of(2018, 11, 29, 13, 15))
+                .basePrice(10000)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 1번 출구")
+                .build();
+
+        this.mockMvc.perform(post("/api/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(this.objectMapper.writeValueAsString(eventDto)))
+                .andExpect(status().isBadRequest());
+    }
 }
