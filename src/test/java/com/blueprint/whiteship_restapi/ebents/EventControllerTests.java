@@ -125,7 +125,7 @@ public class EventControllerTests {
 
     @Test
     @DisplayName("입력 값이 잘 못된 경우 발생하는 테스트")
-    void createEvent_Bad_req_Enpty_Input() throws Exception {
+    void createEvent_Bad_req_Wrong_Input() throws Exception {
         EventDto eventDto = EventDto.builder()
                 .name("Spring")
                 .description("REST API Development whth spring")
@@ -142,6 +142,12 @@ public class EventControllerTests {
         this.mockMvc.perform(post("/api/events")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(this.objectMapper.writeValueAsString(eventDto)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].field").exists())
+                .andExpect(jsonPath("$[0].defaultMessage").exists())
+                .andExpect(jsonPath("$[0].objectName").exists())
+                .andExpect(jsonPath("$[0].defaultMessage").exists())
+                .andExpect(jsonPath("$[0].code").exists())
+        ;
     }
 }

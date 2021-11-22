@@ -37,19 +37,23 @@ public class EventController {
 
     @PostMapping
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+//            응답에 에러값을 보내주고 싶을 경우
+//            return ResponseEntity.badRequest().build();
+//            이렇게 하면 될꺼 같지만 안된다. ! 이유: Errors는 자바빈 스팩을 준수하지 않기 때문이다.!
+//TODO ->> objectMapper에 여러 serializer가 등록이 되어있는데 객체를 json으로 변환할 때
+// objectMapper가 Beanserializer를 사용해서 json으로 변환을 한다.
+// Event 객체가 json으로 변환이 가능 했던건 자바빈 스팩을 준수 했기 때문이고
+// Errors 는 자바빈 스팩을 준수하지 않았기 때문에 변환을 시도하면 에러가 발생한다. 문제 해결방법.! ErrorsSerializer 생성
+        if (errors.hasErrors()){
+            return ResponseEntity.badRequest().body(errors);
         }
-
         eventValidator.validate(eventDto, errors);
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(errors);
         }
         Event event = modelMapper.map(eventDto, Event.class);
         Event newEvent = this.eventRepository.save(event);
         URI createUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
         return ResponseEntity.created(createUri).body(event);
     }
-    
-
 }
