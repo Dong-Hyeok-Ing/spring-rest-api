@@ -29,6 +29,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
+//  제이유닛 파람 의존성 추가
+    implementation 'org.junit.jupiter:junit-jupiter-params:5.4.2'
+
     compileOnly 'org.projectlombok:lombok'
     compileOnly 'org.postgresql:postgresql'
     testImplementation 'com.h2database:h2'
