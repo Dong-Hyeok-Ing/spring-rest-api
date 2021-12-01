@@ -2,7 +2,10 @@ package com.blueprint.whiteship_restapi.ebents;
 
 import org.modelmapper.ModelMapper;
 
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.server.core.ControllerEntityLinksFactoryBean;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -54,7 +57,15 @@ public class EventController {
         Event event = modelMapper.map(eventDto, Event.class);
         event.update();
         Event newEvent = this.eventRepository.save(event);
-        URI createUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
-        return ResponseEntity.created(createUri).body(event);
+
+
+
+        WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
+        URI createUri = selfLinkBuilder.toUri();
+        EventResource eventResource = new EventResource(event);
+        eventResource.add(linkTo(EventController.class).withRel("query_events"));
+        eventResource.add(selfLinkBuilder.withSelfRel());
+        eventResource.add(selfLinkBuilder.withRel("update-event"));
+        return ResponseEntity.created(createUri).body(eventResource);
     }
 }

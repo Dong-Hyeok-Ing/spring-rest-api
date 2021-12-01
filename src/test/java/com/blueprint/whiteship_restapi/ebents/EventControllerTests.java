@@ -66,6 +66,9 @@ public class EventControllerTests {
                 .andExpect(jsonPath("free").value(false))
                 .andExpect(jsonPath("offline").value(true))
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.query_events").exists())
+                .andExpect(jsonPath("_links.update-event").exists())
         ;
 //                .andExpect(header().exists("Location")) 주석처리 된 것을 아래 처럼 타입 세이프 하게
 //                .andExpect(header().string("Content-Type","application/hal+json" ))
