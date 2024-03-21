@@ -76,14 +76,15 @@ public class EventControllerTests {
                 .andExpect(jsonPath("free").value(false))
                 .andExpect(jsonPath("offline").value(true))
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
-                .andExpect(jsonPath("_links.self").exists())
+                /*.andExpect(jsonPath("_links.self").exists()) 아래서 테스트 삭제해도 됨.
                 .andExpect(jsonPath("_links.query-events").exists())
-                .andExpect(jsonPath("_links.update-event").exists())
+                .andExpect(jsonPath("_links.update-event").exists())*/
                 .andDo(document("create-Event",
                         links(
                                 linkWithRel("self").description("link to self"),
                                 linkWithRel("query-events").description("link to query-events"),
-                                linkWithRel("update-event").description("link to update-event")
+                                linkWithRel("update-event").description("link to update-event"),
+                                linkWithRel("profile").description("link to profile")
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("accept header"),
@@ -138,7 +139,8 @@ public class EventControllerTests {
                                 fieldWithPath("eventStatus").description("it tells if this event is eventStatus"),
                                 fieldWithPath("_links.self.href").description("link to self"),
                                 fieldWithPath("_links.query-events.href").description("link to query"),
-                                fieldWithPath("_links.update-event.href").description("link to update")
+                                fieldWithPath("_links.update-event.href").description("link to update"),
+                                fieldWithPath("_links.profile.href").description("link to profile")
                         )
                 ));
 //                .andExpect(header().exists("Location")) 주석처리 된 것을 아래 처럼 타입 세이프 하게
