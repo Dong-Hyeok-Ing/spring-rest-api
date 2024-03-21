@@ -66,6 +66,7 @@ public class EventController {
         eventResource.add(linkTo(EventController.class).withRel("query-events"));
         eventResource.add(selfLinkBuilder.withSelfRel());
         eventResource.add(selfLinkBuilder.withRel("update-event"));
+        eventResource.add(new Link("/docs/rest-api.html").withRel("profile"));
         return ResponseEntity.created(createUri).body(eventResource);
     }
 }
