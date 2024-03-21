@@ -2,7 +2,7 @@ package com.blueprint.whiteship_restapi.ebents;
 
 import com.blueprint.whiteship_restapi.common.RestDocsConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hamcrest.Matchers;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +18,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -73,10 +77,70 @@ public class EventControllerTests {
                 .andExpect(jsonPath("offline").value(true))
                 .andExpect(jsonPath("eventStatus").value(EventStatus.DRAFT.name()))
                 .andExpect(jsonPath("_links.self").exists())
-                .andExpect(jsonPath("_links.query_events").exists())
+                .andExpect(jsonPath("_links.query-events").exists())
                 .andExpect(jsonPath("_links.update-event").exists())
-                .andDo(document("create-Event"))
-        ;
+                .andDo(document("create-Event",
+                        links(
+                                linkWithRel("self").description("link to self"),
+                                linkWithRel("query-events").description("link to query-events"),
+                                linkWithRel("update-event").description("link to update-event")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("accept header"),
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type")
+                        ),
+                        requestFields(
+                                fieldWithPath("name").description("Name of new event"),
+                                fieldWithPath("description").description("description of new event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("date time of begin Enrollment of new event"),
+                                fieldWithPath("closeEnrollmentDateTime").description("date time of closeEnrollment of new event"),
+                                fieldWithPath("beginEventDateTime").description("date time of begin of new event"),
+                                fieldWithPath("endEventDateTime").description("date time of end of new event"),
+                                fieldWithPath("location").description("date time of location of new event"),
+                                fieldWithPath("basePrice").description("date time of BasePrice of new event"),
+                                fieldWithPath("maxPrice").description("date time of maxPrice of new event"),
+                                fieldWithPath("limitOfEnrollment").description("limitOfEnrollment of new event")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.LOCATION).description("Location header"),
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("response content type")
+                        ),
+                        /*relaxedResponseFields( // relaxed 문서일부만 테스트 할 수 있다. 단 정확한 문서를 생성하지 못한다.
+                                fieldWithPath("id").description("id of new event"),
+                                fieldWithPath("name").description("Name of new event"),
+                                fieldWithPath("description").description("description of new event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("date time of begin Enrollment of new event"),
+                                fieldWithPath("closeEnrollmentDateTime").description("date time of closeEnrollment of new event"),
+                                fieldWithPath("beginEventDateTime").description("date time of begin of new event"),
+                                fieldWithPath("endEventDateTime").description("date time of end of new event"),
+                                fieldWithPath("location").description("date time of location of new event"),
+                                fieldWithPath("basePrice").description("date time of BasePrice of new event"),
+                                fieldWithPath("maxPrice").description("date time of maxPrice of new event"),
+                                fieldWithPath("limitOfEnrollment").description("limitOfEnrollment of new event"),
+                                fieldWithPath("free").description("it tells if this event is free"),
+                                fieldWithPath("offline").description("it tells if this event is offline"),
+                                fieldWithPath("eventStatus").description("it tells if this event is eventStatus")
+                        )*/
+                        responseFields( // relaxed 문서일부만 테스트 할 수 있다. 단 정확한 문서를 생성하지 못한다.
+                                fieldWithPath("id").description("id of new event"),
+                                fieldWithPath("name").description("Name of new event"),
+                                fieldWithPath("description").description("description of new event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("date time of begin Enrollment of new event"),
+                                fieldWithPath("closeEnrollmentDateTime").description("date time of closeEnrollment of new event"),
+                                fieldWithPath("beginEventDateTime").description("date time of begin of new event"),
+                                fieldWithPath("endEventDateTime").description("date time of end of new event"),
+                                fieldWithPath("location").description("date time of location of new event"),
+                                fieldWithPath("basePrice").description("date time of BasePrice of new event"),
+                                fieldWithPath("maxPrice").description("date time of maxPrice of new event"),
+                                fieldWithPath("limitOfEnrollment").description("limitOfEnrollment of new event"),
+                                fieldWithPath("free").description("it tells if this event is free"),
+                                fieldWithPath("offline").description("it tells if this event is offline"),
+                                fieldWithPath("eventStatus").description("it tells if this event is eventStatus"),
+                                fieldWithPath("_links.self.href").description("link to self"),
+                                fieldWithPath("_links.query-events.href").description("link to query"),
+                                fieldWithPath("_links.update-event.href").description("link to update")
+                        )
+                ));
 //                .andExpect(header().exists("Location")) 주석처리 된 것을 아래 처럼 타입 세이프 하게
 //                .andExpect(header().string("Content-Type","application/hal+json" ))
 /**
