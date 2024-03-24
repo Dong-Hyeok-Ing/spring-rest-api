@@ -2,8 +2,23 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: true
-  #datasource:
-  #  driver-class-name: org.h2.Driver
-  #  url: jdbc:h2:~/test
-  #  username: sa
-  #  pasqqqsword:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/BootDB
+    username: bootuser
+    password: boot1234
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+
+logging.level: #띄어쓰기 없음
+  org:
+    hibernate:
+      SQL: debug #띄어쓰기 2칸
+      type: trace
+      BasicTypeRegistry: trace
