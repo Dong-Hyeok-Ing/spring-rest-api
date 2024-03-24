@@ -1,5 +1,6 @@
 package com.blueprint.whiteship_restapi.ebents;
 
+import com.blueprint.whiteship_restapi.common.ErrorsResource;
 import org.modelmapper.ModelMapper;
 
 import org.springframework.hateoas.Link;
@@ -48,11 +49,11 @@ public class EventController {
 // Event 객체가 json으로 변환이 가능 했던건 자바빈 스팩을 준수 했기 때문이고
 // Errors 는 자바빈 스팩을 준수하지 않았기 때문에 변환을 시도하면 에러가 발생한다. 문제 해결방법.! ErrorsSerializer 생성
         if (errors.hasErrors()){
-            return ResponseEntity.badRequest().body(errors);
+            return badRequest(errors);
         }
         eventValidator.validate(eventDto, errors);
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().body(errors);
+            return badRequest(errors);
         }
         Event event = modelMapper.map(eventDto, Event.class);
         event.update();
@@ -68,5 +69,9 @@ public class EventController {
         eventResource.add(selfLinkBuilder.withRel("update-event"));
         eventResource.add(new Link("/docs/rest-api.html").withRel("profile"));
         return ResponseEntity.created(createUri).body(eventResource);
+    }
+
+    private static ResponseEntity badRequest(Errors errors) {
+        return ResponseEntity.badRequest().body(ErrorsResource.modelOf(errors));
     }
 }
