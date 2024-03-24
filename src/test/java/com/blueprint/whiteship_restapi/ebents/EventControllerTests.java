@@ -224,9 +224,10 @@ public class EventControllerTests {
                 .andDo(print()) // 응답 바디가 어떻게 찍히는지 확인해 보기 위해 찍어 보았음.
                 .andExpect(status().isBadRequest())
 //                .andExpect(jsonPath("$[0].field").exists()) // 필드에러가 없을 경우 테스트가 깨지기 때문에 주석
-                .andExpect(jsonPath("$[0].objectName").exists())
-                .andExpect(jsonPath("$[0].defaultMessage").exists())
-                .andExpect(jsonPath("$[0].code").exists())
+                .andExpect(jsonPath("errors[0].objectName").exists())
+                .andExpect(jsonPath("errors[0].defaultMessage").exists())
+                .andExpect(jsonPath("errors[0].code").exists())
+                .andExpect(jsonPath("_links.index").exists())
         ;
     }
 }
